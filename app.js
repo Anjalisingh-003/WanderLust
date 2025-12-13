@@ -40,7 +40,8 @@ main()
 async function main() {
   await mongoose.connect(dbUrl);
 }
-
+// console.log("dburl from env", dbUrl);
+// console.log("secret key", secret);
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   crypto: {
