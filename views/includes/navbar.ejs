@@ -44,24 +44,7 @@
                                                 home</strong></a>
                     </ul>
                 </div>
-                <div id="responsive-registration">
-                    <% if(!currUser) { %>
-                        <a class="nav-link" href="/signup"><i class="fa-solid fa-user-plus"></i>&nbsp;&nbsp;<b>Sign
-                                up</b></a>
-                        <a class="nav-link" href="/login"><i class="fa-solid fa-user-check"></i>&nbsp;&nbsp;<b>Log
-                                in</b></a>
-                        <% } %>
-                            <% if(currUser) { %>
-                                <h6 class="mt-1 nav-link"><b><i class="fa-solid fa-user"></i>
-                                        &nbsp; &nbsp;<%= currUser.username%>
-                                    </b></h6>
-                                <a class="nav-link" href="/logout"><i
-                                        class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp;<b>Log out</b></a>
-                                <% } %>
-                                    <a class="nav-link" href="/listings/new"><i
-                                            class="fa-solid fa-circle-plus"></i>&nbsp; &nbsp;<strong>Airbnb your
-                                            home</strong></a>
-                </div>
+               
             </div>
         </div>
     </div>
