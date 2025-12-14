@@ -149,8 +149,8 @@ module.exports.search = async (req, res) => {
   });
   if (allListings.length != 0) {
     res.locals.success = "Listings searched by Title!";
-    res.render("listings/index.ejs", { allListings });
-    return;
+    return res.render("listings/index.ejs", { allListings });
+    
   }
 
   if (allListings.length == 0) {
@@ -159,8 +159,8 @@ module.exports.search = async (req, res) => {
     }).sort({ _id: -1 });
     if (allListings.length != 0) {
       res.locals.success = "Listings searched by Category!";
-      res.render("listings/index.ejs", { allListings });
-      return;
+      return res.render("listings/index.ejs", { allListings });
+      
     }
   }
   if (allListings.length == 0) {
@@ -169,8 +169,8 @@ module.exports.search = async (req, res) => {
     }).sort({ _id: -1 });
     if (allListings.length != 0) {
       res.locals.success = "Listings searched by Country!";
-      res.render("listings/index.ejs", { allListings });
-      return;
+      return res.render("listings/index.ejs", { allListings });
+      
     }
   }
 
@@ -180,8 +180,8 @@ module.exports.search = async (req, res) => {
     }).sort({ _id: -1 });
     if (allListings.length != 0) {
       res.locals.success = "Listings searched by Location!";
-      res.render("listings/index.ejs", { allListings });
-      return;
+      return res.render("listings/index.ejs", { allListings });
+      
     }
   }
 
@@ -194,8 +194,8 @@ module.exports.search = async (req, res) => {
     });
     if (allListings.length != 0) {
       res.locals.success = `Listings searched by price less than Rs ${element}!`;
-      res.render("listings/index.ejs", { allListings });
-      return;
+      return res.render("listings/index.ejs", { allListings });
+      
     }
   }
   if (allListings.length == 0) {

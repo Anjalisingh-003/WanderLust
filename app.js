@@ -81,11 +81,11 @@ app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   res.locals.currUser = req.user;
-  next();
+  return next();
 });
 
 app.get("/", (req, res) => {
-  res.redirect("/listings");
+  return res.redirect("/listings");
 });
 
 app.use("/listings", listingRouter);
@@ -97,6 +97,9 @@ app.all("*", (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  if(res.headersSent){
+    return next(err);
+  }
   let { statusCode = 500, message = "Some Error Occured!" } = err;
   res.status(statusCode).render("./listings/error.ejs", { message });
 });
