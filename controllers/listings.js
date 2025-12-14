@@ -9,11 +9,11 @@ const { listingSchema } = require("../schemaValidation.js");
 
 module.exports.index = async (req, res) => {
   let allListings = await Listing.find();
-  res.render("./listings/index.ejs", { allListings });
+  return res.render("./listings/index.ejs", { allListings });
 };
 
 module.exports.renderNewForm = (req, res) => {
-  res.render("listings/new.ejs");
+  return res.render("listings/new.ejs");
 };
 
 module.exports.showListing = async (req, res) => {
@@ -23,9 +23,9 @@ module.exports.showListing = async (req, res) => {
     .populate("owner");
   if (!listing) {
     req.flash("error", "Listing you requested for does not exist!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }
-  res.render("listings/show.ejs", { listing });
+  return res.render("listings/show.ejs", { listing });
 };
 
 module.exports.createListing = async (req, res, next) => {
@@ -45,23 +45,52 @@ module.exports.createListing = async (req, res, next) => {
   // newListing.geometry = response.body.features[0].geometry;
   await newListing.save();
   req.flash("success", "New listing created!");
-  res.redirect("/listings");
+   return res.redirect("/listings");
 };
 
-module.exports.renderEditForm = async (req, res) => {
+module.exports.renderEditForm = async (req, res, next) => {
   let { id } = req.params;
   let listing = await Listing.findById(id);
   if (!listing) {
     req.flash("error", "Listing you trying to edit for does not exist!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }
-  imageUrl = listing.image.url;
-  imageUrl = imageUrl.replace("/upload", "/upload/w_250,h_160");
-  res.render("listings/edit.ejs", { listing, imageUrl });
+  let imageUrl = "";
+  if(listing.image && listing.image.url){
+    imageUrl = listing.image.url.replace("/upload", "/upload/w_250,h_160");
+  }
+  return res.render("listings/edit.ejs", { listing, imageUrl });
 };
 
 module.exports.updateListing = async (req, res, next) => {
-  let { id } = req.params;
+  try{
+    let { id } = req.params;
+
+    let updatedListing = await Listing.findByIdAndUpdate(id, {
+    ...req.body.listing},
+    {new:true
+  });
+
+  if(!updatedListing){
+    req.flash("error", "Listing not found");
+    return res.redirect("/listings");
+  }
+
+  if(req.file){
+    updatedListing.image = {
+      filename: req.file.filename,
+      url: req.file.path
+    };
+    await updatedListing.save();
+  }
+
+  req.flash("success", "Listing updated!");
+  return res.redirect(`/listings/${id}`);
+  }catch(err){
+    return next(err);
+  }
+}
+  
   // let response = await geoCodingClient
   //   .forwardGeocode({
   //     query: ` ${req.body.listing.location},${req.body.listing.country}`,
@@ -70,37 +99,36 @@ module.exports.updateListing = async (req, res, next) => {
   //   .send();
 
   // req.body.listing.geometry = response.body.features[0].geometry;
-  let updatedListing = await Listing.findByIdAndUpdate(id, {
-    ...req.body.listing,
-  });
+  
 
-  if (typeof req.file !== "undefined") {
-    let url = req.file.path;
-    let filename = req.file.filename;
-    updatedListing.image = { url, filename };
-    await updatedListing.save();
-  }
-  req.flash("success", "Listing updated!");
-  res.redirect(`/listings/${id}`);
-};
+//   if (typeof req.file !== "undefined") {
+//     let url = req.file.path;
+//     let filename = req.file.filename;
+//     updatedListing.image = { url, filename };
+//     await updatedListing.save();
+//   }
+//   req.flash("success", "Listing updated!");
+//   res.redirect(`/listings/${id}`);
+// };
 
 module.exports.filter = async (req, res, next) => {
   let { id } = req.params;
   let allListings = await Listing.find({ category: { $all: [id] } });
   if (allListings.length != 0) {
     res.locals.success = `Listings Filtered by ${id}!`;
-    res.render("listings/index.ejs", { allListings });
+    return res.render("listings/index.ejs", { allListings });
   } else {
     req.flash("error", `There is no any Listing for ${id}!`);
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }
 };
 
 module.exports.search = async (req, res) => {
   let input = req.query.q;
-  if (input == "" || input == " " || !input || input == undefined) {
+  // if (input == "" || input == " " || !input || input == undefined) {
+  if(!input || input.trim()===""){
     req.flash("error", "Please enter search query!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }
 
   input = req.query.q.trim().replace(/\s+/g, " ");
@@ -172,20 +200,29 @@ module.exports.search = async (req, res) => {
   }
   if (allListings.length == 0) {
     req.flash("error", "No listings found based on your search!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }
 };
+
+// //new one suggested by chatgpt
+// module.exports.index = async (req, res)=> {
+//   let allListings = await Listing.find();
+//   return res.render("./listings/index.ejs", {allListings});
+// };
+// module.exports.renderNewForm = (req, res)=>{
+//   return res.render("listings/new.ejs");
+// };
 
 module.exports.destroyListing = async (req, res) => {
   let { id } = req.params;
   let deletedListing = await Listing.findByIdAndDelete(id);
   console.log(deletedListing);
   req.flash("success", "Listing deleted!");
-  res.redirect("/listings");
+  return res.redirect("/listings");
 };
 
 module.exports.reserveListing = async (req, res) => {
   let { id } = req.params;
   req.flash("success", "Reservation Details sent to your Email!");
-  res.redirect(`/listings/${id}`);
+  return res.redirect(`/listings/${id}`);
 };
