@@ -44,9 +44,9 @@ async function main() {
 // console.log("secret key", secret);
 const store = MongoStore.create({
   mongoUrl: dbUrl,
-  crypto: {
-    secret: process.env.SECRET,
-  },
+  // crypto: {
+  //   secret: process.env.SECRET,
+  // },
   touchAfter: 24 * 2600,
 });
 
